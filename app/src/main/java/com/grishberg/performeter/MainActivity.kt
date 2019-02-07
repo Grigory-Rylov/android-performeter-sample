@@ -10,14 +10,19 @@ import com.grishberg.performeter.samples.KotlinSample1
 import com.grishberg.performeter.samples.KotlinSample2
 
 private const val TAG = "Performeter"
+// --es
 private const val MODE_EXTRA = "mode"
+// --ei
+private const val ITERATIONS_EXTRA = "iterations"
+private const val EXPERIMENT_NUMBER_EXTRA = "number"
+
 private const val ITERATIONS_COUNT = 500000
 
 /**
- * --es mode "k vs k"
- * --es mode "j vs k"
- * --es mode "k vs j"
- * --es mode "j vs j"
+ * --es mode "k1"
+ * --es mode "j1"
+ * --es mode "k2"
+ * --es mode "j2"
  */
 class MainActivity : AppCompatActivity() {
     private lateinit var reporter: ResultReporter
@@ -32,61 +37,53 @@ class MainActivity : AppCompatActivity() {
 
     private fun launchPerfTests() {
         val mode = intent.getStringExtra(MODE_EXTRA)
-        val runnable1: RunnableWithResult
-        val runnable2: RunnableWithResult
+        val iterations = intent.getIntExtra(ITERATIONS_EXTRA, ITERATIONS_COUNT)
+        val experimentNumber = intent.getIntExtra(EXPERIMENT_NUMBER_EXTRA, 0)
+        val runnable: RunnableWithResult
         when (mode) {
-            "k vs k" -> {
-                runnable1 = KotlinSample1()
-                runnable2 = KotlinSample2()
+            "k1" -> {
+                runnable = KotlinSample1()
             }
-            "k vs j", "j vs k" -> {
-                runnable1 = JavaSample1()
-                runnable2 = KotlinSample2()
+            "k2" -> {
+                runnable = KotlinSample2()
+            }
+            "j1" -> {
+                runnable = JavaSample1()
             }
             else -> {
-                runnable1 = JavaSample1()
-                runnable2 = JavaSample2()
+                runnable = JavaSample2()
             }
         }
-        start(runnable1, runnable2)
+        start(runnable, iterations, experimentNumber)
     }
 
-    private fun start(runnable1: RunnableWithResult, runnable2: RunnableWithResult) {
-        // single micro benchmark
+    private fun start(
+        runnable: RunnableWithResult,
+        iterations: Int,
+        experimentNumber: Int
+    ) {
+        // single micro benchmark with nano
+        runnable.init()
 
-        val microStartTime1 = System.nanoTime()
-        runnable1.run()
-        val microDuration1 = System.nanoTime() - microStartTime1
-
-        val microStartTime2 = System.nanoTime()
-        runnable2.run()
-        val microDuration2 = System.nanoTime() - microStartTime2
+        val microStartTime = System.nanoTime()
+        runnable.run()
+        val microDuration = System.nanoTime() - microStartTime
 
         // main benchmark
-
-        val startTime = SystemClock.uptimeMillis()
-        val startThreadTime = SystemClock.currentThreadTimeMillis()
-
-        for (i in 0 until ITERATIONS_COUNT) {
-            runnable1.run()
+        runnable.init()
+        var totalThreadTime = 0L
+        for (i in 0 until iterations) {
+            val startThreadTime = SystemClock.currentThreadTimeMillis()
+            runnable.run()
+            totalThreadTime += SystemClock.currentThreadTimeMillis() - startThreadTime
         }
-        val duration1 = SystemClock.uptimeMillis() - startTime
-        val threadDuration1 = SystemClock.currentThreadTimeMillis() - startThreadTime
-
-        val startTime2 = SystemClock.uptimeMillis()
-        val startThreadTime2 = SystemClock.currentThreadTimeMillis()
-        for (i in 0 until ITERATIONS_COUNT) {
-            runnable2.run()
-        }
-        val duration2 = SystemClock.uptimeMillis() - startTime2
-        val threadDuration2 = SystemClock.currentThreadTimeMillis() - startThreadTime2
 
         reporter.reportPerfResults(
-            duration1, duration2,
-            threadDuration1, threadDuration2,
-            microDuration1, microDuration2
+            experimentNumber,
+            totalThreadTime,
+            microDuration
         )
 
-        Log.e(TAG, "result1 = " + runnable1.result + ", result2 = " + runnable2.result)
+        Log.e(TAG, "result_$experimentNumber = " + runnable.result)
     }
 }

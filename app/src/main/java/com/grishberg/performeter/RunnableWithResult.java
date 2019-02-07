@@ -5,4 +5,5 @@ package com.grishberg.performeter;
  */
 public interface RunnableWithResult extends Runnable {
     Object getResult();
+    void init();
 }

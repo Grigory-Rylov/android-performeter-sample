@@ -7,12 +7,9 @@ import android.util.Log
  */
 interface ResultReporter {
     fun reportPerfResults(
-        duration1: Long,
-        duration2: Long,
-        threadDuration1: Long,
-        threadDuration2: Long,
-        microDuration1: Long,
-        microDuration2: Long
+        experimentNumber: Int,
+        threadDuration: Long,
+        microDuration: Long
     )
 }
 
@@ -21,17 +18,10 @@ interface ResultReporter {
  */
 class LogReporter : ResultReporter {
     override fun reportPerfResults(
-        duration1: Long,
-        duration2: Long,
-        threadDuration1: Long,
-        threadDuration2: Long,
-        microDuration1: Long,
-        microDuration2: Long
+        experimentNumber: Int,
+        threadDuration: Long,
+        microDuration: Long
     ) {
-        Log.e(
-            "[PERF]", "(d1=$duration1, d2=$duration2, " +
-                    "td1=$threadDuration1, td2=$threadDuration2, " +
-                    "md1=$microDuration1, md2=$microDuration2)"
-        )
+        Log.e("[PERF_$experimentNumber]", "(td=$threadDuration, md=$microDuration)")
     }
 }
