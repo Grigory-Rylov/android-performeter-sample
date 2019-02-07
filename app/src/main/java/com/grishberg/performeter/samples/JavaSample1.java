@@ -10,6 +10,11 @@ public class JavaSample1 implements RunnableWithResult {
     /* place your fields and methods there */
 
     @Override
+    public void init() {
+        /* place your init code there */
+    }
+
+    @Override
     public void run() {
         /* place your code there */
     }

@@ -9,6 +9,10 @@ class KotlinSample2 : RunnableWithResult {
 
     /* place your fields and methods there */
 
+    override fun init() {
+        /* place your init code there */
+    }
+
     override fun run() {
         /* place your code there */
     }
