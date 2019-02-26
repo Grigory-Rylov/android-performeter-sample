@@ -71,12 +71,11 @@ class MainActivity : AppCompatActivity() {
 
         // main benchmark
         runnable.init()
-        var totalThreadTime = 0L
+        val startThreadTime = SystemClock.currentThreadTimeMillis()
         for (i in 0 until iterations) {
-            val startThreadTime = SystemClock.currentThreadTimeMillis()
             runnable.run()
-            totalThreadTime += SystemClock.currentThreadTimeMillis() - startThreadTime
         }
+        val totalThreadTime = SystemClock.currentThreadTimeMillis() - startThreadTime
 
         reporter.reportPerfResults(
             experimentNumber,
