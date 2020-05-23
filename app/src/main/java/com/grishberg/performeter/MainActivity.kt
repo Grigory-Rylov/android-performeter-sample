@@ -2,8 +2,8 @@ package com.grishberg.performeter
 
 import android.os.Bundle
 import android.os.SystemClock
-import android.support.v7.app.AppCompatActivity
 import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import com.grishberg.performeter.samples.JavaSample1
 import com.grishberg.performeter.samples.JavaSample2
 import com.grishberg.performeter.samples.KotlinSample1
